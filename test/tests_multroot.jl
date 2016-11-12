@@ -5,28 +5,32 @@ using Primes
 
 ## can use functions
 f = x -> (x-1)*(x-2)^2*(x-3)^3
-zs, mults = multroot(f)
-@test mults == [1,2,3]
+U = multroot(f)
+@test length(U) == 3
+@test reduce(&, sort(collect(values(U))) .== [1,2,3])
+
 
 x = poly([0.0])
 
 p = (x-1)*(x-2)^2*(x-3)^3
-zs, mults = multroot(p)
-@test mults == [1,2,3]
+U = multroot(p)
+@test reduce(&, sort(collect(values(U))) .== [1,2,3])
 
 p = (x-1)^2*(x-2)^2*(x-3)^4
-zs, mults = multroot(p)
-@test mults == [2,2,4]
+U = multroot(p)
+@test reduce(&, sort(collect(values(U))) .== [2,2,4])
 
 p = (x-1)^2
-zs, mults = multroot(p^14)
-@test mults == [28]
+U = multroot(p^14)
+@test collect(values(U))[1] == 28
 
 ## test for roots of polynomial functions
-roots(x -> x^5 - x + 1)
+U = roots(x -> x^5 - x + 1)
+@test length(U) == 5
 
 ## test for real roots of polynomial functions
-fzeros(x -> x^5 - 1.5x + 1)
+U = fzeros(x -> x^5 - 1.5x + 1)
+@test length(U) == 1
 
 
 ## for polynomials in Z[x], Q[x] can use algorithm to be accurate for higher degree
@@ -52,12 +56,6 @@ fzeros(x -> x^5 - 2x^4 + x^3)
 factor(x -> (x-2)^4*(x-3)^9)
 factor(x -> (x-1)^3 * (x-2)^3 * (x^5 - x + 1))
 factor(x -> x*(x-1)*(x-2)*(x^2 + x + 1))
-
-factor(x -> (x-1)^2 * (x-.99)^2 * (x-1.01)^2) ## can have issue with nearby roots (or high powers)
-
-factor(x -> (x-1//1)^2 * (x-99//100)^2 * (x-101//100)^2) ## conversion is to Float, not Rational{Int}
-delta = 1//10
-VERSION >= v"0.5.0-" && Primes.factor(convert(Poly{Rational{Int}}, x -> (x-1//1)^2 * (x-1 - delta)^2 * (x-1 + delta)^2))
 
 
 ## Test conversion of polynomials to Int

@@ -202,10 +202,10 @@ function multroot(p::Poly;
 
 
     if maximum(ls) == 1
-        return(zs, ls)
+        return Dict([k=>v for (k,v) in zip(zs, ls)])
     else
         zs = pejroot(p, zs, ls)
-        return(zs, ls)
+        return Dict([k=>v for (k,v) in zip(zs, ls)])        
     end
 end 
 
@@ -223,10 +223,6 @@ function multroot(f::Function; kwargs...)
         error("The function does not compute a univariate polynomial")
     end
     multroot(p; kwargs...)        
-
-
-
-    
 end
 
 ## add funciton interface to Polynomials.roots

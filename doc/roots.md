@@ -9,7 +9,6 @@ We will use these pacakges
 
 ```
 using Plots
-backend(:gadfly)
 using Roots
 ```
 
@@ -34,10 +33,10 @@ f(x) = cos(x) - x
 plot(f, -2,2)
 ```
 
-The basic function call specifies a bracket using vector notation:
+The basic function call specifies a bracket with two arguments"
 
 ```
-x = fzero(f, [0, 1])
+x = fzero(f, 0, 1)
 x, f(x)
 ```
 
@@ -47,7 +46,7 @@ will be a bracket:
 
 ```
 f(x) = sin(x)
-x = fzero(f, [pi/2, 3pi/2])
+x = fzero(f, pi/2, 3pi/2)
 x, f(x)
 ```
 
@@ -96,7 +95,7 @@ For even more precision, `BigFloat` numbers can be used
 
 ```
 x = fzero(sin, big(3))
-x, f(x), x - pi
+x, sin(x), x - pi
 ```
 
 ### Higher order methods
@@ -259,8 +258,6 @@ roots, and then tries to improve these values.
 multroot((x-1)*(x-2)*(x-3))	# roots, multiplicity
 ```
 
-The `factor` function provides a more pleasant output.
-
 
 The `roots` function degrades as there are multiplicities:
 
@@ -272,10 +269,16 @@ roots(p)
 Whereas, `multroot` gets it right.
 
 ```
-factor(p)
+multroot(p)
 ```
 
 The difference gets dramatic when the multiplicities get quite large.
+
+For polynomial functions over the integers or rational numbers, the `factor` function will factor over the integers:
+
+```
+factor(x -> (x-1)^2*(x-3)^4*(5x-6)^7)
+```
 
 ## Classical methods
 
@@ -319,15 +322,21 @@ function `f` (for simple-enough functions):
 newton(f, D(f), 2)
 ```
 
-Or for Halley's method
+The usual notation can be added through:
 
 ```
-halley(f, D(f), D(f,2), 2)
+Base.ctranspose(f::Function) = x -> D(f)(x)
 ```
 
-(The operator `D2(f)` is a convenience for `D(f,2)`.) Specifying the
-derivative(s) can be skipped, the functions will default to the above
-calls.
+Then `f'` can replace `D(f)`.
+
+For Halley's method
+
+```
+halley(f, f', f'', 2)
+```
+
+(If not specified, the derivatives will default to these calls.)
 
 ## Finding critical points
 
@@ -337,7 +346,7 @@ point of the function $f(x) = 1/x^2 + x^3, x > 0$ can be found with:
 
 ```
 f(x) = 1/x^2 + x^3
-fzero(D(f), 1)
+fzero(f', 1)
 ```
 
 For more complicated expressions, `D` will not work. In this example,
