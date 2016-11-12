@@ -76,7 +76,7 @@ Use Algorithm 4.2 of Alefeld, Potra, Shi unless it dithers, in which case the ro
 
 """
 function have_bracket(f, a, b, c=(0.5)*(a+b);
-                      xtol::Real=zero(c), xtolrel::Real=zero(c), maxeval=10, verbose=false)
+                      xtol=zero(c), xtolrel=zero(c), maxeval=10, verbose=false)
     ## try a42a unless it fails, then go to failsafe
     verbose && println("Have a bracket, switching to bracketing method")
     fa, fb = f(a), f(b)
@@ -101,7 +101,7 @@ function have_bracket(f, a, b, c=(0.5)*(a+b);
             return e.x0
         else
             verbose && println("Dithering, switching to bisection method")
-            return find_zero(f, a, b, verbose=verbose)
+            return find_zero(f, Float64(a), Float64(b), verbose=verbose)
         end
     end
 end
