@@ -242,7 +242,7 @@ function fzeros{T <: Real}(f, bracket::Vector{T}; kwargs...)
         find_zeros(f, float(bracket[1]), float(bracket[2]); kwargs...)
     end
 end
-fzeros(f::Function, a::Real, b::Real; kwargs...) = fzeros(f, [a,b]; kwargs...)
+fzeros(f, a::Real, b::Real; kwargs...) = fzeros(f, [a,b]; kwargs...)
 
 
 """
