@@ -39,24 +39,15 @@ _iszero{T<:AbstractFloat}(b::T; xtol=1) = abs(b) <= 2*xtol*eps(T)
 ## p(x) = q(x)*(x-c)^k for some q,k (possibly 0). Return maximal k and corresponding q
 function multiplicity(p::Poly, c::Number)
     k = 0
-    q, r = divrem(p,c)
+    q, r = PolynomialFactors.synthetic_division(p,c)
     while _iszero(r)
         p = q
-        q,r = synthetic_division(p, c)
+        q,r = PolynomialFactors.synthetic_division(p, c)
         k = k + 1
     end
     p, k
 end
 
-## deflate polynomial by x
-function synthetic_division{S,R}(p::Poly{S}, x::R)
-    T = promote_type(S, R)
-    as = T[p[end]]
-    for k = degree(p)-1:-1:0
-        push!(as, p[k] + x * as[end])
-    end
-    return Poly(reverse(as[1:end-1]), p.var), as[end]
-end
 
 ## Our Poly types for which we can find gcd
 typealias QQ  @compat Union{Int, BigInt, Rational{Int}, Rational{BigInt}}
@@ -332,7 +323,7 @@ function real_roots{T <: Union{Int, BigInt}}(p::Poly{T})
     append!(rts, rat_rts)
     
     for rt in rat_rts
-        f, k = synthetic_division(f, rt)
+        f, k = PolynomialFactors.synthetic_division(f, rt)
     end
     
     if degree(f) > 0

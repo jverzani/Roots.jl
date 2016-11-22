@@ -59,7 +59,7 @@ function find_zero(f, a::Float64, b::Float64; xtol::Real=0.0, xtolrel::Real=0.0,
     x0, y0 = a, f(a)
     x2, y2 = b, f(b)
 
-    y0 == 0 && return a
+    y0 == 0.0 && return a
     y2 == 0.0 && return b
     if sign(y0) * sign(y2) > 0
         error("[a,b] is not a bracket") 
@@ -70,6 +70,7 @@ function find_zero(f, a::Float64, b::Float64; xtol::Real=0.0, xtolrel::Real=0.0,
 
     
     while x0 < x1 && x1 < x2
+
         if sign(y0) == sign(y1)
             x0, x2 = x1, x2
             y0, y2 = y1, y2
@@ -79,11 +80,11 @@ function find_zero(f, a::Float64, b::Float64; xtol::Real=0.0, xtolrel::Real=0.0,
         end
         
         x1 = _middle(x0, x2)
+        
         y1 = f(x1)
 
         sign(y1) == 0 && return x1
         abs(x2 - x0) <= max(xtol, xtolrel*abs(x1)) && return(x1)
-
         verbose && println(@sprintf("xi =%18.15f,\t f(xi) = %18.15f", x1, f(x1)))
     end
     

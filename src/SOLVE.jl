@@ -40,12 +40,8 @@ function SOLVE{T<:AbstractFloat}(f, x0::T;
     try
         ## get initial guess. Use Steffensen guess if reasonable size
         stepsize = max(1/100, min(abs(fx0), abs(x0/100)))
-        if fx0 < 0
-            g(x) = -f(x)
-            secant_method_no_bracket(g, x0 - stepsize, x0, ftol=ftol, xtol=xtol, xtolrel=xtolrel, maxeval=maxeval, verbose=verbose)
-        else
-            secant_method_no_bracket(f, x0 - stepsize, x0, ftol=ftol, xtol=xtol, xtolrel=xtolrel, maxeval=maxeval, verbose=verbose)
-        end
+        secant_method_no_bracket(fx0 < 0 ? x -> -f(x) : f,
+                                 x0 - stepsize, x0, ftol=ftol, xtol=xtol, xtolrel=xtolrel, maxeval=maxeval, verbose=verbose)
     catch ex
         if isa(ex, StateConverged)
             return convert(T,ex.x0)
@@ -114,6 +110,7 @@ function secant_method_no_bracket{T<:AbstractFloat}(f, a::T, b::T;
                                   ftol=10*eps(one(float(a))), xtol::Real=10*eps(one(float(a))),
                                   xtolrel::Real=10*eps(one(float(a))),
                                   maxeval::Int=100, verbose::Bool=false)
+
     
     alpha, beta = a, b ## beta keeps smallest values
     falpha, fbeta = f(alpha), f(beta)

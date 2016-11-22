@@ -119,7 +119,9 @@ end
 
 ## use f[a,b] to approximate f'(x)
 function _fbracket(a, b, fa, fb)
-    out = (fb - fa) / (b - a)
+    num, den = fb-fa, b - a
+    num==0 && den == 0 && return Inf, true
+    out = num / den
     out, isissue(out)    
 end
 
