@@ -32,12 +32,12 @@ end
 
 function newton_method{T}(f, fp, x0::T;
                        xtol=4*eps(), xtolrel=4*eps(), ftol=4eps(),
-                       maxsteps::Int=100, maxfnevals=100,
+                       maxeval::Int=100, maxfnevals=100,
                        verbose::Bool=false)
 
     o = newton_itr(f, fp, x0;
                   xtol=xtol, xtolrel=xtolrel, ftol=ftol,
-                  maxsteps=maxsteps, maxfnevals=maxfnevals)
+                  maxsteps=maxeval, maxfnevals=maxfnevals)
 
 
     for x in o
@@ -70,7 +70,7 @@ Keyword arguments:
 
 * `maxeval`. Stop iterating if more than this many steps, throw error.
 
-* `maxfneval`. Stop iterating if more than this many function calls, throw error.
+* `maxfnevals`. Stop iterating if more than this many function calls, throw error.
 
 * `verbose::Bool=false` Set to `true` to see trace.
 
@@ -110,12 +110,12 @@ end
 
 function halley_method{T<:AbstractFloat}(f, fp, fpp, x0::T;
                        xtol=4*eps(), xtolrel=4*eps(), ftol=4eps(),
-                       maxsteps::Int=100, maxfnevals=100,
+                       maxeval::Int=100, maxfnevals=100,
                        verbose::Bool=false)
 
     o = halley_itr(f, fp, fpp, float(x0);
                   xtol=xtol, xtolrel=xtolrel, ftol=ftol,
-                  maxsteps=maxsteps, maxfnevals=maxfnevals)
+                  maxsteps=maxeval, maxfnevals=maxfnevals)
 
     for x in o
         nothing
@@ -148,6 +148,8 @@ Keyword arguments:
 * `xtolrel`. Stop iterating when |xn+1 - xn| <= xtol + max(1, |xn|) * xtolrel
 
 * `maxeval`. Stop iterating if more than this many steps, throw error.
+
+* `maxfnevals`. Stop iterating if more than this many function evaluations are taken, throw error.
 
 * `verbose::Bool=false` Set to `true` to see trace.
 

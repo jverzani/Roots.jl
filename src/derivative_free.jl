@@ -22,10 +22,10 @@ type ZeroType{T, S}
     ftol
     state
     
-    cnt
-    maxcnt
-    fevals
-    maxfevals
+    cnt::Int
+    maxcnt::Int
+    fevals::Int
+    maxfevals::Int
 end
 incfn(o::ZeroType,i::Int=1) = (o.fevals = o.fevals + i)
 inccnt(o::ZeroType, i::Int=1) = (o.cnt = o.cnt + i)
@@ -55,7 +55,7 @@ function Base.done(o::ZeroType, state)
     isinf(o.xn[end]) && throw(ConvergenceFailed("Algorithm escaped to oo"))
                                
     # return turn if f(xn) \approx 0 or xn+1 - xn \approx 0
-    lambda = max(1, abs(o.xn[end]))
+    lambda = max(real(one(o.xn[end])), abs(o.xn[end]))
     ftol = lambda * o.ftol
     xtol = o.xtol +  lambda * o.xtolrel
 
@@ -263,9 +263,8 @@ function kss5_itr(f, x0::Real;
     x, fx = promote(float(x0), f(float(x0)))
     out = ZeroType(f, nothing, nothing, update, [x], [fx],
                    xtol, xtolrel, ftol,:not_converged, 
-                   0, maxsteps, 1, maxfnevals)
+                        0, maxsteps, 1, maxfnevals)
 
-    out
 end
 
 
@@ -440,7 +439,7 @@ initial starting point.
 
 * `maxeval`. Stop iterating if more than this many steps, throw error.
 
-* `maxfneval`. Stop iterating if more than this many function calls, throw error.
+* `maxfnevals`. Stop iterating if more than this many function calls, throw error.
 
 * `order`. One of 0, 1, 2, 5, 8, or 16. Specifies which algorithm to
 use.
@@ -469,9 +468,9 @@ fzero(D(x -> x^2), 1)
 """
 
 function derivative_free{T <: AbstractFloat}(f, x0::T;
-                         ftol::Real = 10.0 * eps(x0),
-                         xtol::Real =  4.0 * eps(x0),
-                         xtolrel::Real = eps(x0),
+                         ftol::Real = 10.0 * eps(one(x0)),
+                         xtol::Real =  4.0 * eps(one(x0)),
+                         xtolrel::Real = eps(one(x0)),
                          maxeval::Int = 30,
                          verbose::Bool=false,
                          order::Int=0,  # 0, 1, 2, 5, 8 or 16
@@ -550,14 +549,14 @@ Keyword arguments:
 
 * `maxeval`. Stop iterating if more than this many steps, throw error.
 
-* `maxfneval`. Stop iterating if more than this many function calls, throw error.
+* `maxfnevals`. Stop iterating if more than this many function calls, throw error.
 
 * `verbose::Bool=false` Set to `true` to see trace.
 
 """
 function secant_method(f, x0::Real, x1::Real;
                        xtol=4*eps(), xtolrel=4*eps(), ftol=4eps(),
-                       maxsteps::Int=100, maxfnevals=100,
+                       maxeval::Int=100, maxfnevals=100,
                        verbose::Bool=false)
 
     x_0, x_1 = float(x0), float(x1)
