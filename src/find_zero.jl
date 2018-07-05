@@ -77,6 +77,7 @@ mutable struct UnivariateZeroOptions{Q,R,S,T}
     reltol::T
     maxevals::Int
     maxfnevals::Int
+    strict::Bool
     verbose::Bool
 end
 
@@ -97,6 +98,7 @@ function init_options(::Any,
                       rtol=missing,
                       maxevals::Int=40,
                       maxfnevals::Int=typemax(Int),
+                      strict::Bool=false,
                       verbose::Bool=false,
                       kwargs...)
 
@@ -113,8 +115,8 @@ function init_options(::Any,
                                     ismissing(xrtol) ?  eps(x1/oneunit(x1)) : xrtol,  # unitless
                                     ismissing(atol)  ?  4.0 * eps(fx1) : atol,  # units of f(x)
                                     ismissing(rtol)  ?  4.0 * eps(fx1/oneunit(fx1)) : rtol, # unitless
-                                    maxevals, maxfnevals,
-    verbose)    
+                                    maxevals, maxfnevals, strict,
+                                    verbose)    
 
     options
 end
@@ -236,7 +238,7 @@ function assess_convergence(method::Any, state, options)
     end
 
     # f(xstar) ≈ xstar * f'(xstar)*eps(), so we pass in lambda
-    if  _isapprox(fxn1, zero(fxn1), options.reltol, options.abstol, abs(xn1))
+    if  iszero(fxn1) || abs(fxn1) <= max(options.abstol, abs(xn1) * options.reltol)
         state.f_converged = true
         return true
     end
@@ -244,7 +246,7 @@ function assess_convergence(method::Any, state, options)
     if _isapprox(xn1, xn0,  options.xreltol, options.xabstol)
         # Heuristic check that f is small too in unitless way
         λ = max(one(real(xn1)), abs(xn1/oneunit(xn1)))
-        if _isapprox(fxn1, zero(fxn1), options.reltol, options.abstol, λ, true)
+        if _isapprox(fxn1, zero(fxn1), options.reltol, options.abstol, λ, !options.strict)
             state.x_converged = true
             return true
         end
@@ -446,7 +448,7 @@ function find_zero(M::AbstractUnivariateZeroMethod,
                 xstar, fxstar = state.xn1, state.fxn1
 
                 λ = max(one(real(xstar)), abs(xstar/oneunit(xstar)))
-                if _isapprox(fxstar, zero(fxstar), options.reltol, options.abstol, λ, true)
+                if _isapprox(fxstar, zero(fxstar), options.reltol, options.abstol, λ, !options.strict)
                     msg = "Algorithm stopped early, but |f(xn)| < ϵ^(1/3), where ϵ depends on xn, rtol, and atol"
                     state.message = state.message == "" ? msg : state.message * "\n\t" * msg
                     state.f_converged = true

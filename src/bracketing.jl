@@ -154,6 +154,7 @@ function init_options(::M,
                       rtol=missing,
                       maxevals::Int=typemax(Int),
                       maxfnevals::Int=typemax(Int),
+                      strict::Bool=false,
                       verbose::Bool=false,
                       kwargs...) where {M <: Union{Bisection64, A42}}
 
@@ -170,8 +171,8 @@ function init_options(::M,
                                     ismissing(xrtol) ?  zero(x1/oneunit(x1)) : xrtol,               # unitless
                                     ismissing(atol)  ? zero(fx1) : atol,  # units of f(x)
                                     ismissing(rtol)  ?  zero(fx1/oneunit(fx1)) : rtol,            # unitless
-                                    maxevals, maxfnevals,
-    verbose)    
+                                    maxevals, maxfnevals, strict,
+                                    verbose)    
 
     options
 end
