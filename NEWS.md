@@ -1,3 +1,9 @@
+CHANGES in v0.7.2
+
+* streamlined code for defaults for `init_options`. Defaults are shown through `?Roots.default_tolerances(M)`.
+
+* fixed issue with `find_zeros` and some number types
+
 CHANGES in v0.7.1
 
 * took algorithm from Order0, and made it an alternative for find_zero allowing other non-bracketing methods to be more robust
