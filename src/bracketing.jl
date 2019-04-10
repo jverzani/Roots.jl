@@ -78,6 +78,21 @@ function init_state(method::AbstractBisection, fs, x)
 
     x0, x1 = adjust_bracket(x) # now finite, right order
     fx0, fx1 = promote(fs(x0), fs(x1))
+    _init_state(method, fs, (x0,x1), (fx0, fx1))
+end
+
+# if computing fxs is expensive, we can bypass it in this manner:
+## function _fz(f, a, b, fa, fb; kwargs...)
+##     M = Roots.Bisection()
+##     state = Roots._init_state(M, f, (a, b), (fa, fb))
+##     options = Roots.init_options(M, state; kwargs...)
+##     find_zero(M, f, options, state)
+## end
+function _init_state(method::AbstractBisection, fs, xs, fxs)
+
+    x0, x1 = xs
+    fx0, fx1 = fxs
+
     sign(fx0) * sign(fx1) > 0 && throw(ArgumentError(bracketing_error))
 
     state = UnivariateZeroState(x1, x0, [x1],
